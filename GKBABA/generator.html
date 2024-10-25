@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Question and Answer Code Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 800px;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+
+        button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result-box {
+            width: 80%;
+            max-width: 800px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f7f7f7;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow-wrap: break-word;
+            white-space: pre-wrap; /* Preserve line breaks */
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Question and Answer Code Generator</h2>
+
+    <label for="textInput">Enter your text (Questions and Answers):</label>
+    <textarea id="textInput" rows="10" placeholder="Enter all questions and answers here..."></textarea>
+
+    <label for="code">Enter HTML Structure:</label>
+    <textarea id="code" rows="5" placeholder="Enter your HTML structure here. Example: &lt;div class='faq'&gt;&lt;h3&gt;question&lt;/h3&gt;&lt;p&gt;answer&lt;/p&gt;&lt;/div&gt;"></textarea>
+
+    <button onclick="generate()">Generate Result</button>
+    <button onclick="copyResult()">Copy Result</button>
+</div>
+
+<div id="result" class="result-box"></div>
+
+<script>
+    function generate() {
+        const textInput = document.getElementById("textInput").value;
+        const codeTemplate = document.getElementById("code").value;
+        const resultDiv = document.getElementById("result");
+
+        // Split the input text into separate lines or sentences
+        const lines = textInput.split('\n').filter(line => line.trim() !== "");
+
+        let outputHTML = "";
+        let currentQuestion = "";
+
+        lines.forEach((line, index) => {
+            // Check if the line contains a question mark, indicating it's a question
+            if (line.includes('?')) {
+                currentQuestion = line.trim(); // Store this as the current question
+            } else {
+                // If not a question, consider it as an answer to the previous question
+                const answer = line.trim();
+                if (currentQuestion) {
+                    // Replace placeholders in the provided HTML structure
+                    let wrappedContent = codeTemplate
+                        .replace(/questions/g, currentQuestion)
+                        .replace(/answer/g, answer);
+                    outputHTML += wrappedContent + "\n";
+                    currentQuestion = ""; // Reset the current question after processing
+                }
+            }
+        });
+
+        // Display the generated result in the result box
+        resultDiv.innerText = outputHTML; // Use innerText to show the HTML code as text
+    }
+
+    function copyResult() {
+        const resultDiv = document.getElementById("result");
+        const resultText = resultDiv.innerText;
+
+        // Create a temporary textarea element to hold the text
+        const tempTextarea = document.createElement("textarea");
+        tempTextarea.value = resultText;
+        document.body.appendChild(tempTextarea);
+
+        // Select and copy the text
+        tempTextarea.select();
+        document.execCommand("copy");
+
+        // Remove the temporary element
+        document.body.removeChild(tempTextarea);
+
+        // Show a confirmation alert
+        alert("Result copied to clipboard!");
+    }
+</script>
+
+</body>
+</html>
